@@ -31,6 +31,44 @@ class SpotifyClient:
 
         return tracks
 
+    def create_playlist(self, name):
+        data = json.dumps({
+            "name": name
+            "description": "Recommended tracks"
+            "public": True
+        })
+
+        url =f"https://api.spotify.com/v1/users/{self.user_id}/playlists"
+        response = self._place_post_api_request
+        response_json = response.json()
+
+        playlist_id = response_json["id"]
+        playlist = Playlist(name, playlist_id)
+        
+        return playlist
+
+    def populate_playlist(self, playlist, tracks):
+        tracks_urls = [track.create_spotify_uri() for track in tracks]
+        data = json.dumps(tracks_uris)
+        url = f"http://api.spotify.com/v1/playlists/{playlist.id}/tracks"
+        response = self._place_post_api_request(url, data)
+        response_json = response.json()
+        return response_json
+
+
+    def _place_post_api_request(self, url, data):
+        response = requests.post(
+            url,
+            data = data,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.authorization_token}"
+            }
+        )
+
+        return response
+
+
     def _place_get_api_request(self, url):
         response = requests.et(
             url,
