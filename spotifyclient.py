@@ -13,14 +13,16 @@ class SpotifyClient:
     def get_last_played_tracks(self, limit=10):
         url = f"https://api.spotify.com/v1/me/player/recently-played?limit={limit}"
         response = self._place_get_api_request(url)
-        response.json = response.json()
+        response_json = response.json()
         tracks = [Track(track["track"]["name"],track["track"]["id"],track["track"]["artists"][0]["name"]) for 
             track in response_json["items"]]
 
         return tracks
 
     def get_track_recommendations(self, seed_tracks, limit=50):
-        for seed_tracks in seed_tracks:
+                
+        seed_tracks_url = ""
+        for seed_track in seed_tracks:
             seed_tracks_url += seed_track.id + ","
         seed_tracks_url = seed_tracks_url[:-1]
         url = f"https://api.spotify.com/v1/resommendations?seed_tracks={seed_tracks_url}&limit={limit}"
@@ -33,8 +35,8 @@ class SpotifyClient:
 
     def create_playlist(self, name):
         data = json.dumps({
-            "name": name
-            "description": "Recommended tracks"
+            "name": name,
+            "description": "Recommended tracks",
             "public": True
         })
 
@@ -70,10 +72,10 @@ class SpotifyClient:
 
 
     def _place_get_api_request(self, url):
-        response = requests.et(
+        response = requests.get(
             url,
             headers={
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
                 "Authorization": f"Bearer {self.authorization_token}"
             }
         )
